@@ -1,4 +1,4 @@
-use clap::{Arg, Command};
+use clap::{arg, Arg, Command};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
@@ -11,6 +11,22 @@ struct AppConfig {
     REPO_PATH: String,
 }
 
+fn parse_repo_path(repo_path: &str) -> Result<String, String> {
+    if PathBuf::from(repo_path).is_absolute() {
+        Ok(repo_path.to_string())
+    } else {
+        Err(String::from("Repo-path must be an absolute path"))
+    }
+}
+
+fn parse_github_token(github_token: &str) -> Result<String, String> {
+    if github_token.starts_with("ghp_") {
+        Ok(github_token.to_string())
+    } else {
+        Err(String::from("GitHub token must start with 'ghp_'"))
+    }
+}
+
 fn main() {
     let app = Command::new("awesome-rust")
         .version("0.1.0")
@@ -19,28 +35,20 @@ fn main() {
         .subcommand(
             Command::new("config")
                 .about("Manage configuration")
-                .arg(
-                    Arg::new("show")
-                        .long("show")
-                        .short('s')
-                        .help("Show config location and its values"),
-                )
-                .arg(
-                    Arg::new("verify")
-                        .long("verify")
-                        .short('v')
-                        .help("Verify config value is okay"),
-                )
+                .arg(arg!(-c --show "Show config location and its values"))
+                .arg(arg!(-v --verify "Verify config value is okay"))
                 .arg(
                     Arg::new("repo-path")
                         .long("repo-path")
                         .value_name("REPO_PATH")
+                        .value_parser(parse_repo_path)
                         .help("Set REPO_PATH value"),
                 )
                 .arg(
                     Arg::new("github-token")
                         .long("github-token")
                         .value_name("GITHUB_TOKEN")
+                        .value_parser(parse_github_token)
                         .help("Set GITHUB_TOKEN value"),
                 ),
         );
@@ -60,13 +68,15 @@ fn main() {
             println!("Configuration verification is not implemented yet");
         }
 
-        if let Some(repo_path) = config_matches.get_one::<&str>("repo-path") {
+        if let Some(repo_path) = config_matches.get_one::<String>("repo-path") {
             config.REPO_PATH = repo_path.to_string();
+            println!("Saving REPO_PATH to config");
             save_config(&config);
         }
 
-        if let Some(github_token) = config_matches.get_one::<&str>("github-token") {
+        if let Some(github_token) = config_matches.get_one::<String>("github-token") {
             config.GITHUB_TOKEN = github_token.to_string();
+            println!("Saving GITHUB_TOKEN to config");
             save_config(&config);
         }
     }
