@@ -56,5 +56,7 @@ fn main() {
             println!("Saving GITHUB_TOKEN to config");
             app_config_manager.save_config();
         }
+    } else {
+        println!("No subcommand was used");
     }
 }

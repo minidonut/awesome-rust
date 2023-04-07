@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -23,5 +23,13 @@ impl AppConfig {
         } else {
             Err(String::from("GitHub token must start with 'ghp_'"))
         }
+    }
+
+    pub fn data_path(&self) -> String {
+        let data_file = Path::new(&self.REPO_PATH)
+            .join("data/git.json")
+            .to_path_buf();
+        let data_file_path = data_file.to_str();
+        data_file_path.unwrap().to_owned()
     }
 }
