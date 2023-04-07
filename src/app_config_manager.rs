@@ -18,6 +18,15 @@ impl AppConfigManager {
         }
     }
 
+    #[cfg(test)]
+    pub fn new_with_conig_path(config_path: PathBuf) -> Self {
+        let config = AppConfigManager::load_or_create_config(&config_path);
+        AppConfigManager {
+            config,
+            config_path,
+        }
+    }
+
     fn load_or_create_config(config_path: &PathBuf) -> AppConfig {
         if !config_path.exists() {
             fs::create_dir_all(config_path.parent().unwrap())
@@ -52,5 +61,50 @@ impl AppConfigManager {
         let project_dirs = ProjectDirs::from("", "", "awesome-rust").unwrap();
         let config_dir = project_dirs.config_dir();
         config_dir.join("config.json")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::remove_file;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_new() {
+        let temp_dir = tempdir().unwrap();
+        let config_path = temp_dir.path().join("config.json");
+
+        let manager = AppConfigManager::new_with_conig_path(config_path.clone());
+
+        assert_eq!(manager.config.GITHUB_TOKEN, "");
+        assert_eq!(manager.config.REPO_PATH, "");
+
+        remove_file(config_path).unwrap();
+        temp_dir.close().unwrap();
+    }
+
+    #[test]
+    fn test_save_config() {
+        let temp_dir = tempdir().unwrap();
+        let config_path = temp_dir.path().join("config.json");
+
+        let mut manager = AppConfigManager::new_with_conig_path(config_path.clone());
+        manager.config.GITHUB_TOKEN = "test_token".to_string();
+        manager.config.REPO_PATH = "/test/path".to_string();
+
+        manager.save_config();
+
+        let mut saved_config = String::new();
+        File::open(config_path.clone())
+            .unwrap()
+            .read_to_string(&mut saved_config)
+            .unwrap();
+
+        assert!(saved_config.contains("test_token"));
+        assert!(saved_config.contains("/test/path"));
+
+        remove_file(config_path).unwrap();
+        temp_dir.close().unwrap();
     }
 }
