@@ -41,7 +41,7 @@ fn main() {
         }
 
         if config_matches.get_flag("verify") {
-            // Implement your verification logic here
+            // TODO: Implement verification logic here
             println!("Configuration verification is not implemented yet");
         }
 

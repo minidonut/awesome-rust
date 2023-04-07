@@ -5,7 +5,7 @@
 
 ## Related
 
-- [All Awesome Lists](https://github.com/topics/awesome) - All the Awesome lists on GitHub.
-- [Awesome](https://github.com/rust-unofficial/awesome-rust) - Original awesome by sindresorhus
+-   [All Awesome Lists](https://github.com/topics/awesome) - All the Awesome lists on GitHub.
+-   [Awesome Rust](https://github.com/rust-unofficial/awesome-rust) - A curated list of Rust code and resources.
 
 ## Crates
