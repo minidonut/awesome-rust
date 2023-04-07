@@ -14,7 +14,7 @@ struct AppConfig {
 fn main() {
     let app = Command::new("awesome-rust")
         .version("0.1.0")
-        .author("Your Name <youremail@example.com>")
+        .author("Karl Saehun Chung <nycom13@gmail.com>")
         .about("An awesome Rust CLI application")
         .subcommand(
             Command::new("config")
@@ -50,26 +50,22 @@ fn main() {
     if let Some(config_matches) = matches.subcommand_matches("config") {
         let mut config = load_or_create_config();
 
-        match config_matches {
-            ("show", _) => {}
-        };
-
-        if config_matches.is_present("show") {
+        if config_matches.get_flag("show") {
             println!("Config location: {:?}", config_path());
             println!("Config values: {:?}", config);
         }
 
-        if config_matches.is_present("verify") {
+        if config_matches.get_flag("verify") {
             // Implement your verification logic here
             println!("Configuration verification is not implemented yet");
         }
 
-        if let Some(repo_path) = config_matches.value_of("repo-path") {
+        if let Some(repo_path) = config_matches.get_one::<&str>("repo-path") {
             config.REPO_PATH = repo_path.to_string();
             save_config(&config);
         }
 
-        if let Some(github_token) = config_matches.value_of("github-token") {
+        if let Some(github_token) = config_matches.get_one::<&str>("github-token") {
             config.GITHUB_TOKEN = github_token.to_string();
             save_config(&config);
         }
