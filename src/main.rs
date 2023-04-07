@@ -13,7 +13,7 @@ fn main() {
         .subcommand(
             Command::new("config")
                 .about("Manage configuration")
-                .arg(arg!(-c --show "Show config location and its values"))
+                .arg(arg!(-s --show "Show config location and its values"))
                 .arg(arg!(-v --verify "Verify config value is okay"))
                 .arg(
                     Arg::new("repo-path")
@@ -35,16 +35,6 @@ fn main() {
     let mut app_config_manager = AppConfigManager::new();
 
     if let Some(config_matches) = matches.subcommand_matches("config") {
-        if config_matches.get_flag("show") {
-            println!("Config location: {:?}", app_config_manager.config_path);
-            println!("Config values: {:?}", app_config_manager.config);
-        }
-
-        if config_matches.get_flag("verify") {
-            // TODO: Implement verification logic here
-            println!("Configuration verification is not implemented yet");
-        }
-
         if let Some(repo_path) = config_matches.get_one::<String>("repo-path") {
             app_config_manager.config.REPO_PATH = repo_path.to_string();
             println!("Saving REPO_PATH to config");
@@ -55,6 +45,16 @@ fn main() {
             app_config_manager.config.GITHUB_TOKEN = github_token.to_string();
             println!("Saving GITHUB_TOKEN to config");
             app_config_manager.save_config();
+        }
+
+        if config_matches.get_flag("verify") {
+            // TODO: Implement verification logic here
+            println!("Configuration verification is not implemented yet");
+        }
+
+        if config_matches.get_flag("show") {
+            println!("Config location: {:?}", app_config_manager.config_path);
+            println!("Config values: {:?}", app_config_manager.config);
         }
     } else {
         println!("No subcommand was used");
